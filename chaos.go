@@ -7,27 +7,18 @@ import (
 	"os"
 )
 
-// func logistic(a, x float64) float64 {
-// 	return a * x * (1 - x)
-// }
-
-// func df_logistic(a, x float64) float64 {
-// 	return math.Log(math.Abs(a * (1 - 2*x)))
-// }
-
-func logistic(a, b, x, y float64) (xn, yn float64) {
-	xn = 1 - a*x*x + y
-	yn = b * x
-	return xn, yn
+func logistic(a, x float64) float64 {
+	return a * x * (1 - x)
 }
 
-// func df_logistic(a, b, x, y float64) (xl, yl float64) {
-// 	xl = math.Log(math.Abs(-2 * a * x))
-// }
+func df_logistic(a, x float64) float64 {
+	return math.Log(math.Abs(a * (1 - 2*x)))
+}
+
 func main() {
 
 	xf, _ := os.Create("logistic.dat")
-	dxf, _ := os.Create("logistic_dx.dat")
+	dxf, _ := os.Create("logistic_ly.dat")
 	defer xf.Close()
 	defer dxf.Close()
 	xfb := bufio.NewWriter(xf)

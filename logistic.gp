@@ -10,7 +10,7 @@ set key left top
 # set title "Plot x"
 set xlabel "a"
 set ylabel "x"
-plot "logistic.dat" title "logistic map" with dots, "logistic_dx.dat" title "Lyapunov exponent" with line
+plot "logistic.dat" title "logistic map" with dots, "logistic_ly.dat" title "Lyapunov of logistic " with line
 
 
 # set title "Plot for dx"
