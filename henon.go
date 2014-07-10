@@ -49,7 +49,8 @@ func Jcb(a, b, x float64) *mat.Dense {
 func MatrixLength(m mat.Matrix) float64 {
 	tmp := &mat.Dense{}
 	tmp.MulElem(m, m)
-	return math.Sqrt(tmp.Sum())
+	res := math.Sqrt(tmp.Sum())
+	return res
 }
 
 func main() {
@@ -62,9 +63,9 @@ func main() {
 	dxfb := bufio.NewWriter(dxf)
 
 	// for initial condition
-	a, b := 0.0, 0.3
-	scale := 10000
-	steps := 2 * scale
+	a, b := 0.82, 0.3
+	scale := 1000
+	steps := 1 * scale
 
 	// for the Lyapunov
 
@@ -76,7 +77,7 @@ func main() {
 		a = a + 1.0/float64(scale)
 		x, y := rand.Float64(), rand.Float64()
 		e0_sum := 0.0
-		iterates := 1000
+		iterates := 100
 		for i := 0; i < iterates; i++ {
 			// for the ly
 			// Step 2
@@ -88,9 +89,18 @@ func main() {
 			f1 := &mat.Dense{}
 			f1.Mul(jcb, f0)
 
-			// Step 3
-			e0_sum += math.Log(MatrixLength(e1))
+			d := MatrixLength(e1)
+			if math.IsNaN(d) {
+				fmt.Printf("the x %f\n", x)
+				fmt.Printf("the e0 is %v\n", fm{e0, 0})
+				fmt.Printf("the jcb is %v\n", fm{jcb, 0})
+				panic("Nan appears!")
+			}
 
+			// Step 3
+			fmt.Printf("A: %f, B: %f , x : %f, ===> distance : %f\n", a, b, x, d)
+			e0_sum += math.Log(MatrixLength(e1))
+			fmt.Printf("sum : %f \n\n", e0_sum)
 			// Step 4
 			tmp.Reset()
 			tmp.TCopy(f1)
