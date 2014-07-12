@@ -6,7 +6,6 @@ import (
 	"github.com/gonum/blas/goblas"
 	mat "github.com/gonum/matrix/mat64"
 	"math"
-	"math/rand"
 	"os"
 )
 
@@ -33,14 +32,6 @@ func henon(a, b, x, y float64) (xn, yn float64) {
 	return xn, yn
 }
 
-func draw_henon(a, b float64) (x, y float64) {
-	x, y = rand.Float64(), rand.Float64()
-	for i := 0; i < 1000*10; i++ {
-		x, y = henon(a, b, x, y)
-	}
-	return x, y
-}
-
 func Jcb(a, b, x float64) *mat.Dense {
 	jcb := mat.NewDense(2, 2, []float64{-2 * a * x, 1, b, 0})
 	return jcb
@@ -65,21 +56,26 @@ func main() {
 	// for initial condition
 	a, b := 0.0, 0.3
 	scale := 10000
-	steps := 2 * scale
 
 	// for the Lyapunov
 
 	eb := 1.0 / math.Sqrt(2)
 	e0 := mat.NewDense(2, 1, []float64{-eb, eb})
 	f0 := mat.NewDense(2, 1, []float64{eb, eb})
-	x0, y0 := 0.1, 0.2
 
-	for idx := 0; idx < steps; idx++ {
+	x0, y0 := 0.1, 0.3
+	fmt.Printf("x0: %f, y0: %f \n", x0, y0)
+	num := 200
+
+	for idx := 0; a < 1.5; idx++ {
 		a = a + 1.0/float64(scale)
 		e0_sum := 0.0
-		iterates := 1000 * 10
 		x, y := x0, y0
-		for i := 0; i < iterates; i++ {
+
+		for i := 0; i < num; i++ {
+			x, y = henon(a, b, x, y)
+		}
+		for i := 0; i < num; i++ {
 			// for the ly
 			// Step 2
 			tmp := &mat.Dense{}
@@ -111,10 +107,9 @@ func main() {
 			f0.Scale(1.0/MatrixLength(f1), f1)
 			e0.Scale(1.0/MatrixLength(e1), e1)
 			x, y = henon(a, b, x, y)
+			xfb.WriteString(fmt.Sprintf("%f %f\n", a, x))
 		}
-
-		dxfb.WriteString(fmt.Sprintf("%f %f\n", a, e0_sum/float64(iterates)))
-		xfb.WriteString(fmt.Sprintf("%f %f\n", a, x))
+		dxfb.WriteString(fmt.Sprintf("%f %f\n", a, e0_sum/float64(num)))
 	}
 	dxfb.Flush()
 	xfb.Flush()
