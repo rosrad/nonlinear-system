@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"math"
 	"os"
@@ -15,8 +16,21 @@ func df_logistic(a, x float64) float64 {
 	return math.Log(math.Abs(a * (1 - 2*x)))
 }
 
-func main() {
+func PhaseGraph(a float64) {
+	para_f, _ := os.Create("logistic_phase.dat")
+	defer para_f.Close()
+	para_fb := bufio.NewWriter(para_f)
 
+	n := 200 * 2
+	x := 0.1
+	for i := 0; i < n; i++ {
+		x = logistic(a, x)
+		para_fb.WriteString(fmt.Sprintf("%d %f\n", i, x))
+	}
+	para_fb.Flush()
+}
+
+func LyapunovExponents() {
 	xf, _ := os.Create("logistic.dat")
 	dxf, _ := os.Create("logistic_ly.dat")
 	defer xf.Close()
@@ -45,4 +59,12 @@ func main() {
 	}
 	xfb.Flush()
 	dxfb.Flush()
+}
+
+func main() {
+	var a float64
+	flag.Float64Var(&a, "a", 0.1, "para for logistic map")
+	flag.Parse()
+	fmt.Println("Para a:", a)
+	PhaseGraph(a)
 }

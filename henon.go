@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"github.com/gonum/blas/goblas"
 	mat "github.com/gonum/matrix/mat64"
@@ -44,7 +45,25 @@ func MatrixLength(m mat.Matrix) float64 {
 	return res
 }
 
-func main() {
+func PhaseGraph(a, b float64) {
+	para_f, _ := os.Create("henon_phase.dat")
+	defer para_f.Close()
+	para_fb := bufio.NewWriter(para_f)
+
+	num := 10000 * 20 * 10
+	x, y := 0.1, 0.3
+
+	for i := 0; i < 1000; i++ {
+		x, y = henon(a, b, x, y)
+	}
+	for i := 0; i < num; i++ {
+		x, y = henon(a, b, x, y)
+		para_fb.WriteString(fmt.Sprintf("%f %f\n", x, y))
+	}
+	para_fb.Flush()
+}
+
+func LyapunovExponents() {
 	xf, _ := os.Create("henon.dat")
 	defer xf.Close()
 	xfb := bufio.NewWriter(xf)
@@ -52,6 +71,10 @@ func main() {
 	dxf, _ := os.Create("henon_ly.dat")
 	defer dxf.Close()
 	dxfb := bufio.NewWriter(dxf)
+
+	zdxf, _ := os.Create("henon_ly_zero.dat")
+	defer zdxf.Close()
+	zdxfb := bufio.NewWriter(zdxf)
 
 	// for initial condition
 	a, b := 0.0, 0.3
@@ -63,6 +86,7 @@ func main() {
 	e0 := mat.NewDense(2, 1, []float64{-eb, eb})
 	f0 := mat.NewDense(2, 1, []float64{eb, eb})
 
+	ze := 0.005
 	x0, y0 := 0.1, 0.3
 	fmt.Printf("x0: %f, y0: %f \n", x0, y0)
 	num := 200
@@ -109,8 +133,28 @@ func main() {
 			x, y = henon(a, b, x, y)
 			xfb.WriteString(fmt.Sprintf("%f %f\n", a, x))
 		}
-		dxfb.WriteString(fmt.Sprintf("%f %f\n", a, e0_sum/float64(num)))
+		ly := e0_sum / float64(num)
+		dxfb.WriteString(fmt.Sprintf("%f %f\n", a, ly))
+
+		if math.Abs(ly) < ze {
+			zdxfb.WriteString(fmt.Sprintf("%f %f\n", a, ly))
+		}
 	}
+	zdxfb.Flush()
 	dxfb.Flush()
 	xfb.Flush()
+}
+
+func PhaseMain() {
+	var a, b float64
+	flag.Float64Var(&a, "a", 0.1, "para for logistic map")
+	flag.Float64Var(&b, "b", 0.3, "para for logistic map")
+	flag.Parse()
+	fmt.Printf("Para a: %f, b: %f\n", a, b)
+	PhaseGraph(a, b)
+}
+
+func main() {
+	// LyapunovExponents()
+	PhaseMain()
 }
