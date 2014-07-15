@@ -19,8 +19,8 @@ set yrange [-1:0.5]
 set xlabel "a"
 set ylabel "xn"
 plot "henon_ly.dat" title "henon ly" with dots,\
-     "henon_ly_zero.dat.mlt" with points ,\
-    "" using 1:2:3 with labels offset 0,1
+     "henon_ly_zero.dat.mlt" with points notitle,\
+    "" using 1:2:3 with labels offset 0,1 notitle
 unset multiplot
 
 unset output

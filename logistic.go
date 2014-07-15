@@ -20,8 +20,7 @@ func PhaseGraph(a float64) {
 	para_f, _ := os.Create("logistic_phase.dat")
 	defer para_f.Close()
 	para_fb := bufio.NewWriter(para_f)
-
-	n := 200 * 2
+	n := 200 * 200
 	x := 0.1
 	for i := 0; i < n; i++ {
 		x = logistic(a, x)
@@ -38,6 +37,11 @@ func LyapunovExponents() {
 	xfb := bufio.NewWriter(xf)
 	dxfb := bufio.NewWriter(dxf)
 
+	zdxf, _ := os.Create("logistic_ly_zero.dat")
+	defer zdxf.Close()
+	zdxfb := bufio.NewWriter(zdxf)
+
+	ze := 0.01
 	x0 := 0.1
 	var x, a float64
 	n := 200
@@ -55,16 +59,28 @@ func LyapunovExponents() {
 			x = logistic(a, x)
 			xfb.WriteString(fmt.Sprintf("%f %f\n", a, x))
 		}
-		dxfb.WriteString(fmt.Sprintf("%f %f\n", a, sum/float64(n*2)))
+		ly := sum / float64(n*2)
+		dxfb.WriteString(fmt.Sprintf("%f %f\n", a, ly))
+
+		if math.Abs(ly) < ze {
+			zdxfb.WriteString(fmt.Sprintf("%f %f\n", a, ly))
+		}
+
 	}
+	zdxfb.Flush()
 	xfb.Flush()
 	dxfb.Flush()
 }
 
-func main() {
+func PhaseMain() {
 	var a float64
 	flag.Float64Var(&a, "a", 0.1, "para for logistic map")
 	flag.Parse()
 	fmt.Println("Para a:", a)
 	PhaseGraph(a)
+}
+
+func main() {
+	// LyapunovExponents()
+	PhaseMain()
 }

@@ -10,8 +10,10 @@ set key left top
 # set title "Plot x"
 set xlabel "a"
 set ylabel "x"
-plot "logistic.dat" title "logistic map" with dots, "logistic_ly.dat" title "Lyapunov of logistic " with line
-
+plot "logistic.dat" title "logistic map" with dots,\
+     "logistic_ly.dat" title "Lyapunov of logistic " with line,\
+     "logistic_ly_zero.dat.mlt" using 1:2 with points notitle, \
+     "" using 1:2:3 with labels offset 0,1 notitle
 
 # set title "Plot for dx"
 # set ylabel "dx"

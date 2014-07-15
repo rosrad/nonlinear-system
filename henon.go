@@ -58,7 +58,7 @@ func PhaseGraph(a, b float64) {
 	}
 	for i := 0; i < num; i++ {
 		x, y = henon(a, b, x, y)
-		para_fb.WriteString(fmt.Sprintf("%f %f\n", x, y))
+		para_fb.WriteString(fmt.Sprintf("%d %f\n", i, x))
 	}
 	para_fb.Flush()
 }
